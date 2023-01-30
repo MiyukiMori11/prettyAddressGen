@@ -54,8 +54,6 @@ func (w *workerPool) CloseAll() {
 	close(w.in)
 	close(w.out)
 	for _, wk := range w.workers {
-		go func(w worker) {
-			w.Quit <- struct{}{}
-		}(wk)
+		wk.Stop()
 	}
 }

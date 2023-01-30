@@ -7,7 +7,7 @@ import (
 	"github.com/MiyukiMori11/prettyAddressGen/internal/workerPool"
 )
 
-type addrCreator interface {
+type AddrCreator interface {
 	Create() (address string, publicKey string, privateKey string)
 }
 
@@ -18,12 +18,12 @@ type addressInfo struct {
 }
 
 type generator struct {
-	network addrCreator
+	network AddrCreator
 
 	workerPool workerPool.WorkerPool
 }
 
-func New(network addrCreator, wkPool workerPool.WorkerPool) (*generator, error) {
+func New(network AddrCreator, wkPool workerPool.WorkerPool) (*generator, error) {
 	if network == nil {
 		return nil, errors.New("network can't be nil")
 	}
@@ -41,7 +41,9 @@ func (g *generator) Generate(pattern string, workersNum, resultsNum int64) ([]ad
 
 	result := make([]addressInfo, 0, resultsNum)
 
-	g.workerPool.AddWorkers(workersNum)
+	if err := g.workerPool.AddWorkers(workersNum); err != nil {
+		return nil, err
+	}
 
 	genFunc := func() interface{} {
 		re := regexp.MustCompile(pattern)
