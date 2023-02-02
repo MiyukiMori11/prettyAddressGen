@@ -11,12 +11,6 @@ type AddrCreator interface {
 	Create() (address string, publicKey string, privateKey string)
 }
 
-type addressInfo struct {
-	address    string
-	publicKey  string
-	privateKey string
-}
-
 type generator struct {
 	network AddrCreator
 

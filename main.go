@@ -28,7 +28,18 @@ func main() {
 		log.Fatal("unexpected network")
 	}
 
-	g, _ := generator.New(nw, workerPool.New())
+	g, err := generator.New(nw, workerPool.New())
 
-	fmt.Println(g.Generate(*pattern, *workers, *results))
+	if err != nil {
+		panic(err)
+	}
+
+	r, err := g.Generate(*pattern, *workers, *results)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, a := range r {
+		fmt.Printf("address: %s\npublic key: %s\nprivate key: %s\n", a.Address(), a.PublicKey(), a.PrivateKey())
+	}
 }
