@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 
 	"github.com/MiyukiMori11/prettyAddressGen/internal/eth"
 	"github.com/MiyukiMori11/prettyAddressGen/internal/generator"
@@ -35,7 +37,10 @@ func main() {
 		panic(err)
 	}
 
-	r, err := g.Generate(context.TODO(), *pattern, *workers, *results)
+	ctx, cancelFunc := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	defer cancelFunc()
+
+	r, err := g.Generate(ctx, *pattern, *workers, *results)
 	if err != nil {
 		panic(err)
 	}
