@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -34,7 +35,7 @@ func main() {
 		panic(err)
 	}
 
-	r, err := g.Generate(*pattern, *workers, *results)
+	r, err := g.Generate(context.TODO(), *pattern, *workers, *results)
 	if err != nil {
 		panic(err)
 	}
@@ -42,4 +43,5 @@ func main() {
 	for _, a := range r {
 		fmt.Printf("address: %s\npublic key: %s\nprivate key: %s\n", a.Address(), a.PublicKey(), a.PrivateKey())
 	}
+
 }

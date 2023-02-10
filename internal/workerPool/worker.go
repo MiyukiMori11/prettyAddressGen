@@ -6,9 +6,10 @@ import (
 
 type worker struct {
 	ID   int
-	Task <-chan taskFunc
-	Out  chan interface{}
+	Task <-chan TaskFunc
+	Out  chan<- interface{}
 	Quit chan struct{}
+	done bool
 }
 
 func (wk *worker) Run() {
@@ -17,9 +18,16 @@ loop:
 	for {
 		select {
 		case <-wk.Quit:
+			wk.makeDone()
 			break loop
-		case task := <-wk.Task:
-			wk.Out <- task()
+		case task, ok := <-wk.Task:
+			if ok {
+				wk.Out <- task()
+			} else {
+				wk.makeDone()
+				break loop
+			}
+
 		}
 	}
 
@@ -27,8 +35,14 @@ loop:
 }
 
 func (wk *worker) Stop() {
-	go func() {
-		wk.Quit <- struct{}{}
-	}()
+	wk.Quit <- struct{}{}
 
+}
+
+func (wk *worker) IsDone() bool {
+	return wk.done
+}
+
+func (wk *worker) makeDone() {
+	wk.done = true
 }
